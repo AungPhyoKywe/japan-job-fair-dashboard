@@ -35,13 +35,11 @@ class CvReportController extends Controller
 
             return view('report',['cv_report'=>$cv_report]);
         }
-        $cv_report=CvReport::where('apply_for',$request->applyfor);
-        $cv_report->where('gender',$request->gender);
-        $cv_report->where('japanese_skill',$request->jpskill);
-        $cv_report->where('approve',$request->approve);
-        $cv_report->get();
-
-
+        $cv_report=CvReport::where('apply_for',$request->applyfor)
+            ->where('gender',$request->gender)
+            ->where('approve',$request->approve)
+            ->where('japanese_skill',$request->jpskill)
+            ->get();
         return view('report',['cv_report'=>$cv_report]);
     }
 }
