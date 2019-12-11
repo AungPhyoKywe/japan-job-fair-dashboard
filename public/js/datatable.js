@@ -1,4 +1,6 @@
 $(document).ready(function() {
+
+
     $('#example').DataTable({
         "dom": '<"top"f>rt<"bottom"lp><"clear">',
         "bFilter": false,
@@ -29,8 +31,8 @@ $(document).ready(function() {
         } );
     } );
 
-
 } );
+
 
 
 

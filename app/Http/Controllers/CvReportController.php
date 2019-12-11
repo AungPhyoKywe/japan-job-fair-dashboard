@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\CvReport;
 use App\User;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Http\Request;
+use File;
+use Yajra\Datatables\Datatables;
 use App\Exports\UsersExport;
+use ZipArchive;
 
 
 class CvReportController extends Controller
@@ -14,32 +16,46 @@ class CvReportController extends Controller
     public function index()
 
     {
-        $cv_report=CvReport::all();
+        //$cv_report=CvReport::all();
 
-        return view('report',['cv_report'=>$cv_report]);
+        return view('backend.cv_report.cvreport');
 
     }
 
     public static function report()
     {
-
-        return Excel::download(new UsersExport(), 'disney.xlsx');
+        $cv_report=CvReport::all();
+        return Datatables::of($cv_report)->make(true);
     }
 
-    public function search(Request $request)
+    public function search()
 
-    {
-        if ($request->applyfor == 'All')
-        {
-            $cv_report=CvReport::all();
+    {       $request=request();
+        if ($request->action_type=='export') {
+            return Excel::download(new UsersExport, 'users.xlsx');
 
-            return view('report',['cv_report'=>$cv_report]);
         }
-        $cv_report=CvReport::where('apply_for',$request->applyfor)
-            ->where('gender',$request->gender)
-            ->where('approve',$request->approve)
-            ->where('japanese_skill',$request->jpskill)
-            ->get();
-        return view('report',['cv_report'=>$cv_report]);
+        elseif($request->action_type=='download'){
+            $zip = new ZipArchive;
+
+            $fileName = 'myNewFile.zip';
+
+
+            if ($zip->open(public_path($fileName), ZipArchive::CREATE) === TRUE)
+            {
+                $files = File::files(public_path('upload'));
+
+                foreach ($files as $key => $value) {
+                    $relativeNameInZipFile = basename($value);
+                    $zip->addFile($value, $relativeNameInZipFile);
+                }
+
+                $zip->close();
+            }
+
+            return response()->download(public_path($fileName));
+
+        }
+
     }
 }
